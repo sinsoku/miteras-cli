@@ -1,0 +1,24 @@
+[package]
+name = "miteras"
+version = "0.1.0"
+authors = ["sinsoku <sinsoku.listy@gmail.com>"]
+license = "MIT"
+homepage = "https://github.com/sinsoku/miteras-cli"
+repository = "https://github.com/sinsoku/miteras-cli"
+description = "A command-line tool for MITERAS."
+edition = "2018"
+
+[dependencies]
+chrono = "0.4.11"
+clap = "2.33.0"
+dirs = "2.0.2"
+reqwest = { version = "0.10", features = ["blocking", "cookies", "json"] }
+rpassword = "4.0.5"
+scraper = "0.11.0"
+serde = "1.0.104"
+serde_json = "1.0.48"
+tokio = { version = "0.2", features = ["macros"] }
+toml = "0.5.6"
+
+[dev-dependencies]
+mockito = "0.23.3"
