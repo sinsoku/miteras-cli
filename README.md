@@ -1,3 +1,6 @@
+![build](https://github.com/sinsoku/miteras-cli/workflows/build/badge.svg)
+[![codecov](https://codecov.io/gh/sinsoku/miteras-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/sinsoku/miteras-cli)
+
 # MITERAS CLI
 
 An (**unofficial**) command-line tool for [MITERAS](https://www.persol-pt.co.jp/miteras/).
