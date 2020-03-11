@@ -1,10 +1,23 @@
-name: Nightly
+name: build
 
 on: [pull_request]
 
 jobs:
-  coverage:
+  fmt:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-10.15]
     steps:
       - uses: actions/checkout@v2
 
@@ -25,25 +38,7 @@ jobs:
           path: target
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
-      - name: cargo clean
-        uses: actions-rs/cargo@v1
-        with:
-          command: clean
       - name: cargo test
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --all-features --no-fail-fast
-        env:
-          CARGO_INCREMENTAL: '0'
-          RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads'
-      - id: coverage
-        uses: actions-rs/grcov@v0.1
-      - name: Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          file: ${{ steps.coverage.outputs.report }}
