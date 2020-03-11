@@ -150,3 +150,16 @@ impl Api {
         format!("{}/{}/{}", ENDPOINT, self.config.org, path)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::condition_value;
+
+    #[test]
+    fn str_to_num() {
+        assert_eq!(1, condition_value("best"));
+        assert_eq!(2, condition_value("good"));
+        assert_eq!(3, condition_value("normal"));
+        assert_eq!(4, condition_value("bad"));
+    }
+}
