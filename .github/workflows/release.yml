@@ -58,7 +58,7 @@ jobs:
           zip --junk-paths miteras-${{ matrix.target }}.zip target/${{ matrix.target }}/release/miteras{,.exe}
       - uses: actions/upload-artifact@v1
         with:
-          name: build-${{ matrix.target }}.zip
+          name: build-${{ matrix.target }}
           path: miteras-${{ matrix.target }}.zip
 
   release:
@@ -69,10 +69,10 @@ jobs:
       # download zip files
       - uses: actions/download-artifact@v1
         with:
-          name: build-x86_64-apple-darwin.zip
+          name: build-x86_64-apple-darwin
       - uses: actions/download-artifact@v1
         with:
-          name: build-x86_64-unknown-linux-gnu.zip
+          name: build-x86_64-unknown-linux-gnu
 
       # create release
       - id: create_release
@@ -89,14 +89,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build-x86_64-apple-darwin.zip
-          asset_name: build-x86_64-apple-darwin.zip
+          asset_path: ./build-x86_64-apple-darwin/miteras-x86_64-apple-darwin.zip
+          asset_name: miteras-x86_64-apple-darwin.zip
           asset_content_type: application/zip
       - uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build-x86_64-unknown-linux-gnu.zip
-          asset_name: build-x86_64-unknown-linux-gnu.zip
+          asset_path: ./build-x86_64-unknown-linux-gnu/miteras-x86_64-unknown-linux-gnu.zip
+          asset_name: miteras-x86_64-unknown-linux-gnu.zip
           asset_content_type: application/zip
