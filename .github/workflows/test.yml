@@ -17,4 +17,4 @@ jobs:
             const buf = fs.readFileSync('README.md')
             const hashHex = crypto.createHash('sha256').update(buf, 'utf8').digest('hex')
             console.log(hashHex)
-            console.log(context.payload.ref)
+            eval(fs.readFileSync('test.js'))
