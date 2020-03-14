@@ -1,0 +1,18 @@
+name: test_formula
+
+on: [push]
+
+jobs:
+  test_formula:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@0.8.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const crypto = require('crypto')
+            const fs = require('fs')
+
+            const buf = fs.readFileSync('README.md')
+            const hashHex = crypto.createHash('sha256').update(buf, 'utf8').digest('hex')
+            console.log(hashHex)
