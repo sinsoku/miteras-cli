@@ -13,6 +13,6 @@ jobs:
             const crypto = require('crypto')
             const fs = require('fs')
 
-            const buf = fs.readFileSync('README.md')
+            const buf = fs.readFileSync('./README.md')
             const hashHex = crypto.createHash('sha256').update(buf, 'utf8').digest('hex')
             console.log(hashHex)
