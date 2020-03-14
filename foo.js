@@ -1,2 +1,2 @@
 console.log("test.js")
-console.log(context.payload.ref)
+console.log(process.versions)
