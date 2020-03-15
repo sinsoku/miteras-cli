@@ -1,4 +1,3 @@
-use dirs::home_dir;
 use serde::{Deserialize, Serialize};
 use std::fs::{self, File};
 use std::io::Write;
@@ -12,7 +11,12 @@ pub struct Config {
 }
 
 fn config_path() -> PathBuf {
-    home_dir().unwrap().join(".config/miteras.toml")
+    let base_path = if cfg!(test) {
+        std::env::current_dir().unwrap().join("tmp")
+    } else {
+        dirs::home_dir().unwrap().join(".config")
+    };
+    base_path.join("miteras.toml")
 }
 
 impl Config {
@@ -40,5 +44,39 @@ impl Config {
         file.flush()?;
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{config_path, Config};
+    use std::fs;
+
+    #[test]
+    fn test_config_path() {
+        let path = std::env::current_dir().unwrap().join("tmp/miteras.toml");
+        assert_eq!(path, config_path());
+    }
+
+    #[test]
+    fn test_save_and_load() {
+        let path = config_path();
+        if path.exists() {
+            fs::remove_file(path).ok();
+        }
+
+        let config = Config::new(
+            "A123456".to_string(),
+            "sinsoku".to_string(),
+            "pass1234".to_string(),
+        );
+
+        config.save().ok();
+        assert_eq!(true, config_path().exists());
+
+        let loaded = Config::load().unwrap();
+        assert_eq!("A123456", loaded.org);
+        assert_eq!("sinsoku", loaded.username);
+        assert_eq!("pass1234", loaded.password);
     }
 }
