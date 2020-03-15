@@ -2,7 +2,6 @@ use crate::api::Api;
 use crate::config::Config;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use rpassword::read_password;
-use std::collections::HashMap;
 use std::io::{stdin, stdout, Write};
 
 pub fn build_app() -> App<'static, 'static> {
@@ -57,7 +56,7 @@ pub fn login() {
     let res = api.login().unwrap();
 
     if res.url().path().ends_with("/cico") {
-        config.save();
+        config.save().ok();
         println!("\nLogin successful.");
     } else {
         println!("\nLogin failed.");
