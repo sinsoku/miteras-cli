@@ -1,4 +1,6 @@
 extern crate assert_cmd;
+#[macro_use]
+extern crate clap;
 extern crate predicates;
 
 use assert_cmd::prelude::*;
@@ -11,5 +13,5 @@ fn with_version_args() {
     cmd.arg("--version")
         .assert()
         .success()
-        .stdout("miteras 0.1.1\n");
+        .stdout(format!("miteras {}\n", crate_version!()));
 }
