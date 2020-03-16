@@ -5,6 +5,21 @@
 
 An (**unofficial**) command-line tool for [MITERAS](https://www.persol-pt.co.jp/miteras/).
 
+## Installation
+
+### Install from GitHub Releases
+
+Download the latest version from [GitHub Releases](https://github.com/sinsoku/miteras-cli/releases).
+
+### Homebrew on macOS
+
+If you are using MacOS, you can install with [Homebrew](https://brew.sh/).
+
+```console
+$ brew tap sinsoku/tap
+$ brew install miteras-cli
+```
+
 ## Usage
 
 ### login
