@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8" />
+	
+	<title>Login</title>
+	<link rel="shortcut icon" href="../static/favicon.ico" />
+	<link rel="stylesheet" href="../../loginResource/bootstrap2/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../loginResource/bootstrap2/css/bootstrap-theme.min.css" />
+	<link rel="stylesheet" href="../../loginResource/common/css/common.css" />
+	<link rel="stylesheet" href="../../loginResource/classic/css/classic.css" />
+	<link rel="stylesheet" href="../../loginResource/classic/css/login.css" />
+	<link rel="stylesheet" href="../../loginResource/classic/css/modal.css" />
+	<link rel="stylesheet" href="../../loginResource/pnotify/pnotify.custom.min.css" />
+
+	<meta content="" name="ctx" />
+	<script type="text/javascript" src="../../loginResource/jquery/jquery-2.2.4.min.js"></script>
+	<script type="text/javascript" src="../../loginResource/jquery/jquery.mask.js"></script>
+	<script type="text/javascript" src="../../loginResource/bootstrap2/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../loginResource/bootstrap/bootstrap-select.js"></script>
+	<script type="text/javascript" src="../../loginResource/common/js/common.js"></script>
+	<script type="text/javascript" src="../../loginResource/classic/js/classic.js"></script>
+	<script type="text/javascript" src="../../loginResource/classic/js/login.js"></script>
+	<script type="text/javascript" src="../../loginResource/pnotify/pnotify.custom.min.js"></script>
+	<script type="text/javascript">
+		var errorMsg ='';
+		var loginErrorMsg = 'Incorrect Login ID or password.';
+		var accountLock = 'Account is locked.'
+		var multiValidError = 'There are [X] errors.'
+		var detailBtn = 'Detail'
+		var flg;
+		var alreadyChanged = 'The password has been changed.'
+
+		$(function(){
+			if (errorMsg != ""){
+				$("#message").text(eval(errorMsg));
+				$("#login-message").removeClass("hidden");
+			}
+
+			$('#mailInfo').hide();
+			$("#toMail").on('click',function(){
+				 $('#mailInfo').toggle();
+			});
+
+			$("#forgetPassword").click(function(){
+				redirectToPageViaFormSubmitPC("passwordForget");
+			});
+
+		});
+	</script>
+</head>
+
+<body>
+	<div id="wrapper">
+		<div class="login-div" id="">
+			<div class="alert alert-danger margin-bottom-1 hidden" id="login-message">
+				<strong id="message"></strong>
+			</div>
+			<div class="alert alert-info margin-bottom-1 hidden" id="logout-message">Logged Out</div>
+			<label class="hidden" id="isLoggedOut"></label>
+			<div class="m_bottom10">
+				<img class="hito_logo" src="../loginResource/common/img/MiTERAS_logo.png" />
+			</div>
+
+      <form id="login_form" method="post" action="/{{org}}/auth">
+				<fieldset id="login_field">
+					<div class="col-lg-32 col-md-32 col-xs-32 margin-bottom-3 col-lg-offset-8 col-md-offset-8 col-xs-offset-8 login-group">
+						<div class="form-group">
+							<input class="formsTxtBox-1 col-lg-48 col-md-48 col-xs-48 margin-bottom-1 hasBorder" id="username" name="username" type="text" placeholder="Login ID" />
+						</div>
+						<div class="form-group">
+							<input class="formsTxtBox-1 col-lg-48 col-md-48 col-xs-48 margin-bottom-1" id="password" name="password" type="password" placeholder="PASSWORD" />
+						</div>
+						<div class="form-group">
+							<input class="btnAction btnAction--M col-lg-48 col-md-48 col-xs-48 bg-light-1 padding-bottom-1 padding-top-1 login-button" type="submit" value="click" />
+						</div>
+					</div>
+				</fieldset>
+			<input type="hidden" name="_csrf" value="eb19bc8b-b3c9-40a1-a29a-9eaba3f74ad0" /></form>
+
+			<div class="m_top20">
+				<h5>
+					<a class="color-dark-1 pointer" id="forgetPassword">If you forgot your password, click here</a>
+				</h5>
+				<div>
+					<div><div></div></div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	<div style="margin-left: auto;margin-right: auto;max-width: 100vw; margin-top: 50px;">
+		
+	</div>
+	<div class="u_txtC u_maT40 additionalMessage">
+			<div>* please use Google Chrome</div>
+	</div>
+	<div id="popover_content_wrapper" style="display: none">
+		<div id="list-of-error-messages"></div>
+	</div>
+
+</body></html>
