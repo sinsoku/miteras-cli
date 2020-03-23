@@ -83,7 +83,7 @@ pub fn clock_out(matches: &ArgMatches) {
 
 #[cfg(test)]
 mod tests {
-    use super::{build_app, clock_in, Config};
+    use super::{build_app, clock_in, clock_out, Config};
     use chrono::prelude::*;
     use handlebars::Handlebars;
     use mockito::{mock, Matcher};
@@ -129,6 +129,54 @@ mod tests {
         let app = build_app().get_matches_from(vec!["miteras", "clock-in"]);
         if let Some(matches) = app.subcommand_matches("clock-in") {
             clock_in(&matches);
+        }
+
+        _m1.assert();
+        _m2.assert();
+        _m3.assert();
+    }
+
+    #[test]
+    fn clock_out_no_args() {
+        let config = Config::new(
+            "A123456".to_string(),
+            "sinsoku".to_string(),
+            "pass1234".to_string(),
+        );
+        config.save().ok();
+
+        let mut handlebars = Handlebars::new();
+        handlebars
+            .register_templates_directory(".hbs", "./tests/templates")
+            .unwrap();
+        let mut data = BTreeMap::new();
+        data.insert("org".to_string(), "A123456".to_string());
+        let _m1 = mock("GET", "/A123456/login")
+            .with_body(handlebars.render("login", &data).unwrap())
+            .create();
+        let _m2 = mock("POST", "/A123456/auth")
+            .with_body(handlebars.render("cico", &data).unwrap())
+            .create();
+
+        let today = Local::today();
+        let work_date_string = format!("{}-{}-{}", today.year(), today.month(), today.day());
+        let params = json!({
+            "clockOutCondition": {
+                "condition": 2
+            },
+            "dailyPlaceEvidence": {},
+            "workDateString": work_date_string,
+            "stampBreakStart": "",
+            "stampBreakEnd": ""
+        });
+        let _m3 = mock("POST", "/A123456/submitClockOut")
+            .match_header("content-type", "application/json")
+            .match_body(Matcher::Json(params))
+            .create();
+
+        let app = build_app().get_matches_from(vec!["miteras", "clock-out"]);
+        if let Some(matches) = app.subcommand_matches("clock-out") {
+            clock_out(&matches);
         }
 
         _m1.assert();
