@@ -4,6 +4,22 @@ use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use rpassword::read_password;
 use std::io::{stdin, stdout, Write};
 
+pub fn run() {
+    let matches = build_app().get_matches();
+
+    if let Some(_matches) = matches.subcommand_matches("login") {
+        login();
+    }
+
+    if let Some(matches) = matches.subcommand_matches("clock-in") {
+        clock_in(matches);
+    }
+
+    if let Some(matches) = matches.subcommand_matches("clock-out") {
+        clock_out(matches);
+    }
+}
+
 pub fn build_app() -> App<'static, 'static> {
     app_from_crate!()
         .setting(AppSettings::SubcommandRequiredElseHelp)
