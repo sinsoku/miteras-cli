@@ -4,9 +4,7 @@ use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use rpassword::read_password;
 use std::io::{stdin, stdout, Write};
 
-pub fn run() {
-    let matches = build_app().get_matches();
-
+pub fn run(matches: ArgMatches) {
     if let Some(_matches) = matches.subcommand_matches("login") {
         login();
     }
@@ -99,7 +97,7 @@ pub fn clock_out(matches: &ArgMatches) {
 
 #[cfg(test)]
 mod tests {
-    use super::{build_app, clock_in, clock_out, Config};
+    use super::{build_app, run, Config};
     use chrono::prelude::*;
     use handlebars::Handlebars;
     use mockito::{mock, Matcher};
@@ -142,10 +140,8 @@ mod tests {
             .match_body(Matcher::Json(params))
             .create();
 
-        let app = build_app().get_matches_from(vec!["miteras", "clock-in"]);
-        if let Some(matches) = app.subcommand_matches("clock-in") {
-            clock_in(&matches);
-        }
+        let matches = build_app().get_matches_from(vec!["miteras", "clock-in"]);
+        run(matches);
 
         _m1.assert();
         _m2.assert();
@@ -190,10 +186,8 @@ mod tests {
             .match_body(Matcher::Json(params))
             .create();
 
-        let app = build_app().get_matches_from(vec!["miteras", "clock-out"]);
-        if let Some(matches) = app.subcommand_matches("clock-out") {
-            clock_out(&matches);
-        }
+        let matches = build_app().get_matches_from(vec!["miteras", "clock-out"]);
+        run(matches);
 
         _m1.assert();
         _m2.assert();
