@@ -2,11 +2,12 @@ use crate::api::Api;
 use crate::config::Config;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use rpassword::read_password;
-use std::io::{stdin, stdout, Write};
+use rpassword::read_password_with_reader;
+use std::io::{self, BufRead, Empty, Write};
 
 pub fn run(matches: ArgMatches) {
     if let Some(_matches) = matches.subcommand_matches("login") {
-        login();
+        login(None::<Empty>, io::stdout());
     }
 
     if let Some(matches) = matches.subcommand_matches("clock-in") {
@@ -46,34 +47,50 @@ pub fn build_app() -> App<'static, 'static> {
         )
 }
 
-fn read_input(label: &str, hidden: bool) -> String {
-    print!("{}: ", label);
-    stdout().flush().unwrap();
+fn read_input<R: BufRead, W: Write>(
+    label: &str,
+    hidden: bool,
+    source: Option<R>,
+    mut writer: W,
+) -> String {
+    write!(&mut writer, "{}: ", label).unwrap();
+    writer.flush().unwrap();
 
     if hidden {
-        read_password().unwrap()
+        match source {
+            Some(reader) => read_password_with_reader(Some(reader)).unwrap(),
+            None => read_password().unwrap(),
+        }
     } else {
         let mut input = String::new();
-        stdin().read_line(&mut input).unwrap();
+        match source {
+            Some(mut reader) => {
+                reader.read_line(&mut input).unwrap();
+            }
+            None => {
+                io::stdin().read_line(&mut input).unwrap();
+            }
+        }
         input.trim().to_string()
     }
 }
 
-pub fn login() {
-    println!("Try logging in to MITERAS.\n");
+pub fn login<R: BufRead, W: Write>(mut source: Option<R>, mut writer: W) {
+    write!(&mut writer, "Try logging in to MITERAS.\n").unwrap();
 
-    let org = read_input("Org", false);
-    let username = read_input("Username", false);
-    let password = read_input("Password", true);
+    let org = read_input("Org", false, source.as_mut(), &mut writer);
+    let username = read_input("Username", false, source.as_mut(), &mut writer);
+    let password = read_input("Password", true, source.as_mut(), &mut writer);
     let config = Config::new(org, username, password);
+
     let api = Api::new(&config);
     let res = api.login().unwrap();
 
     if res.url().path().ends_with("/cico") {
         config.save().ok();
-        println!("\nLogin successful.");
+        write!(&mut writer, "\nLogin successful.").unwrap();
     } else {
-        println!("\nLogin failed.");
+        write!(&mut writer, "\nLogin failed.").unwrap();
     }
 }
 
