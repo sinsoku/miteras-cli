@@ -114,11 +114,44 @@ pub fn clock_out(matches: &ArgMatches) {
 
 #[cfg(test)]
 mod tests {
-    use super::{build_app, run, Config};
+    use super::{build_app, login, run, Config};
     use chrono::prelude::*;
     use handlebars::Handlebars;
     use mockito::{mock, Matcher};
     use std::collections::BTreeMap;
+    use std::io::Cursor;
+
+    #[test]
+    fn login_with_valid_args() {
+        let mut handlebars = Handlebars::new();
+        handlebars
+            .register_templates_directory(".hbs", "./tests/templates")
+            .unwrap();
+        let mut data = BTreeMap::new();
+        data.insert("org".to_string(), "A123456".to_string());
+        let _m1 = mock("GET", "/A123456/login")
+            .with_body(handlebars.render("login", &data).unwrap())
+            .create();
+        let _m2 = mock("POST", "/A123456/auth")
+            .with_status(302)
+            .with_header("Location", "/A123456/cico")
+            .create();
+        let _m3 = mock("GET", "/A123456/cico")
+            .with_body(handlebars.render("cico", &data).unwrap())
+            .create();
+
+        let source = Cursor::new(b"A123456\nsinsoku\npass1234");
+        let mut writer = Vec::<u8>::new();
+        login(Some(source), &mut writer);
+
+        _m1.assert();
+        _m2.assert();
+        _m3.assert();
+        assert_eq!(
+            String::from_utf8(writer).unwrap(),
+            "Try logging in to MITERAS.\nOrg: Username: Password: \nLogin successful."
+        );
+    }
 
     #[test]
     fn clock_in_no_args() {
