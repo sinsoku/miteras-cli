@@ -55,7 +55,9 @@ jobs:
 
       # archive and upload
       - run: |
-          zip --junk-paths miteras-${{ matrix.target }}.zip target/${{ matrix.target }}/release/miteras{,.exe}
+          cd target/${{ matrix.target }}/release/
+          cp -r build/miteras-*/out/ misc/
+          zip ../../../miteras-${{ matrix.target }}.zip miteras{,.exe} misc/*
       - uses: actions/upload-artifact@v1
         with:
           name: build-${{ matrix.target }}
