@@ -125,10 +125,16 @@ mod tests {
             .create()
     }
 
-    fn mock_auth() -> Mock {
+    fn mock_auth(success: bool) -> Mock {
+        let location = if success {
+            "/A123456/cico"
+        } else {
+            "/A123456/login"
+        };
+        println!("{}", location);
         mock("POST", "/A123456/auth")
             .with_status(302)
-            .with_header("Location", "/A123456/cico")
+            .with_header("Location", location)
             .create()
     }
 
@@ -141,7 +147,7 @@ mod tests {
     #[test]
     fn login_with_valid_args() {
         let _m1 = mock_login();
-        let _m2 = mock_auth();
+        let _m2 = mock_auth(true);
         let _m3 = mock_cico();
 
         let source = Cursor::new(b"A123456\nsinsoku\npass1234");
@@ -158,6 +164,26 @@ mod tests {
     }
 
     #[test]
+    fn login_with_invalid_args() {
+        let _m1 = mock("GET", "/A123456/login")
+            .with_body_from_file("tests/files/login.html")
+            .expect(2)
+            .create();
+        let _m2 = mock_auth(false);
+
+        let source = Cursor::new(b"A123456\nsinsoku\npassXXX");
+        let mut writer = Vec::<u8>::new();
+        login(Some(source), &mut writer);
+
+        _m1.assert();
+        _m2.assert();
+        assert_eq!(
+            String::from_utf8(writer).unwrap(),
+            "Try logging in to MITERAS.\nOrg: Username: Password: \nLogin failed."
+        );
+    }
+
+    #[test]
     fn clock_in_no_args() {
         let config = Config::new(
             "A123456".to_string(),
@@ -167,7 +193,7 @@ mod tests {
         config.save().ok();
 
         let _m1 = mock_login();
-        let _m2 = mock_auth();
+        let _m2 = mock_auth(true);
         let _m3 = mock_cico();
 
         let today = Local::today();
@@ -204,7 +230,7 @@ mod tests {
         config.save().ok();
 
         let _m1 = mock_login();
-        let _m2 = mock_auth();
+        let _m2 = mock_auth(true);
         let _m3 = mock_cico();
 
         let today = Local::today();
