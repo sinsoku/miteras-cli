@@ -116,29 +116,33 @@ pub fn clock_out(matches: &ArgMatches) {
 mod tests {
     use super::{build_app, login, run, Config};
     use chrono::prelude::*;
-    use handlebars::Handlebars;
-    use mockito::{mock, Matcher};
-    use std::collections::BTreeMap;
+    use mockito::{mock, Matcher, Mock};
     use std::io::Cursor;
+
+    fn mock_login() -> Mock {
+        mock("GET", "/A123456/login")
+            .with_body_from_file("tests/files/login.html")
+            .create()
+    }
+
+    fn mock_auth() -> Mock {
+        mock("POST", "/A123456/auth")
+            .with_status(302)
+            .with_header("Location", "/A123456/cico")
+            .create()
+    }
+
+    fn mock_cico() -> Mock {
+        mock("GET", "/A123456/cico")
+            .with_body_from_file("tests/files/cico.html")
+            .create()
+    }
 
     #[test]
     fn login_with_valid_args() {
-        let mut handlebars = Handlebars::new();
-        handlebars
-            .register_templates_directory(".hbs", "./tests/templates")
-            .unwrap();
-        let mut data = BTreeMap::new();
-        data.insert("org".to_string(), "A123456".to_string());
-        let _m1 = mock("GET", "/A123456/login")
-            .with_body(handlebars.render("login", &data).unwrap())
-            .create();
-        let _m2 = mock("POST", "/A123456/auth")
-            .with_status(302)
-            .with_header("Location", "/A123456/cico")
-            .create();
-        let _m3 = mock("GET", "/A123456/cico")
-            .with_body(handlebars.render("cico", &data).unwrap())
-            .create();
+        let _m1 = mock_login();
+        let _m2 = mock_auth();
+        let _m3 = mock_cico();
 
         let source = Cursor::new(b"A123456\nsinsoku\npass1234");
         let mut writer = Vec::<u8>::new();
@@ -162,18 +166,9 @@ mod tests {
         );
         config.save().ok();
 
-        let mut handlebars = Handlebars::new();
-        handlebars
-            .register_templates_directory(".hbs", "./tests/templates")
-            .unwrap();
-        let mut data = BTreeMap::new();
-        data.insert("org".to_string(), "A123456".to_string());
-        let _m1 = mock("GET", "/A123456/login")
-            .with_body(handlebars.render("login", &data).unwrap())
-            .create();
-        let _m2 = mock("POST", "/A123456/auth")
-            .with_body(handlebars.render("cico", &data).unwrap())
-            .create();
+        let _m1 = mock_login();
+        let _m2 = mock_auth();
+        let _m3 = mock_cico();
 
         let today = Local::today();
         let work_date_string = format!("{}-{}-{}", today.year(), today.month(), today.day());
@@ -185,7 +180,7 @@ mod tests {
             "workDateString": work_date_string,
             "enableBreakTime": false
         });
-        let _m3 = mock("POST", "/A123456/submitClockIn")
+        let _m4 = mock("POST", "/A123456/submitClockIn")
             .match_header("content-type", "application/json")
             .match_body(Matcher::Json(params))
             .create();
@@ -196,6 +191,7 @@ mod tests {
         _m1.assert();
         _m2.assert();
         _m3.assert();
+        _m4.assert();
     }
 
     #[test]
@@ -207,18 +203,9 @@ mod tests {
         );
         config.save().ok();
 
-        let mut handlebars = Handlebars::new();
-        handlebars
-            .register_templates_directory(".hbs", "./tests/templates")
-            .unwrap();
-        let mut data = BTreeMap::new();
-        data.insert("org".to_string(), "A123456".to_string());
-        let _m1 = mock("GET", "/A123456/login")
-            .with_body(handlebars.render("login", &data).unwrap())
-            .create();
-        let _m2 = mock("POST", "/A123456/auth")
-            .with_body(handlebars.render("cico", &data).unwrap())
-            .create();
+        let _m1 = mock_login();
+        let _m2 = mock_auth();
+        let _m3 = mock_cico();
 
         let today = Local::today();
         let work_date_string = format!("{}-{}-{}", today.year(), today.month(), today.day());
@@ -231,7 +218,7 @@ mod tests {
             "stampBreakStart": "",
             "stampBreakEnd": ""
         });
-        let _m3 = mock("POST", "/A123456/submitClockOut")
+        let _m4 = mock("POST", "/A123456/submitClockOut")
             .match_header("content-type", "application/json")
             .match_body(Matcher::Json(params))
             .create();
@@ -242,5 +229,6 @@ mod tests {
         _m1.assert();
         _m2.assert();
         _m3.assert();
+        _m4.assert();
     }
 }
