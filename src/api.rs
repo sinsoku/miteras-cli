@@ -1,12 +1,13 @@
 use crate::config::Config;
 use chrono::prelude::*;
+#[cfg(test)]
+use mockito;
 use reqwest::blocking::{Client, Response};
 use reqwest::header;
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-static ENDPOINT: &str = "https://kintai.miteras.jp";
 static APP_USER_AGENT: &str = "miteras-cli";
 
 pub struct Api {
@@ -147,7 +148,12 @@ impl Api {
     }
 
     fn build_url(&self, path: &str) -> String {
-        format!("{}/{}/{}", ENDPOINT, self.config.org, path)
+        #[cfg(not(test))]
+        let endpoint = "https://kintai.miteras.jp";
+        #[cfg(test)]
+        let endpoint = &mockito::server_url();
+
+        format!("{}/{}/{}", endpoint, self.config.org, path)
     }
 }
 

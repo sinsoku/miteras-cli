@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+
+		<title>打刻画面</title>
+		<meta charset="UTF-8" />
+	    <meta name="ctx" />
+	    <meta name="_csrf" content="4e5844e0-71bd-4086-b8f9-8db014d35c75" />
+		<meta name="_csrf_header" content="X-CSRF-TOKEN" />
+		<link rel="shortcut icon" href="/../static/favicon.ico" />
+     	<link rel="stylesheet" href="../../plugins/bootstrap2/css/bootstrap.min.css" /> 
+        <link rel="stylesheet" href="../../plugins/bootstrap2/css/bootstrap-toggle.min.css" />
+        <link rel="stylesheet" href="../../plugins/font-awesome/css/font-awesome.css" />
+	    <link rel="stylesheet" href="../../plugins/bootstrap/bootstrap-select.css" />
+	    <link rel="stylesheet" href="../../plugins/bootstrap/bootstrap-datepicker.css" />
+	    <link rel="stylesheet" href="../../plugins/pnotify/pnotify.custom.min.css" />
+	    <link rel="stylesheet" href="../../common/css/common.css" />
+
+		
+ 	    <script charset="UTF-8" type="text/javascript" src="../../plugins/jquery/jquery-2.2.4.min.js"></script>
+	    <script charset="UTF-8" type="text/javascript" src="../../plugins/jquery/jquery.mask.js"></script>
+	    <script charset="UTF-8" type="text/javascript" src="../../plugins/moment/moment.js"></script>
+	    <script charset="UTF-8" type="text/javascript" src="../../plugins/bootstrap2/js/bootstrap.min.js"></script>
+	    <script type="text/javascript" src="../../plugins/bootstrap2/js/bootstrap-toggle.min.js"></script>
+	    <script charset="UTF-8" type="text/javascript" src="../../plugins/bootstrap/bootstrap-select.js"></script>
+	    <script charset="UTF-8" type="text/javascript" src="../../plugins/bootstrap/bootstrap-datepicker.js"></script>
+	    <script type="text/javascript" src="../../plugins/bootstrap/bootstrap-datepicker.ja.min.js"></script>
+	    <script charset="UTF-8" type="text/javascript" src="../../plugins/pnotify/pnotify.custom.min.js"></script>
+	   <!-- <script type="text/javascript" th:src="@{../../plugins/niceScroll/jquery.nicescroll.min.js}"></script> -->
+	    <script charset="UTF-8" type="text/javascript" src="../../common/js/common.js"></script>
+	    <script charset="UTF-8" type="text/javascript" src="../../classic/js/mymenu.js"></script>
+	    <script charset="UTF-8" type="text/javascript" src="../../classic/js/classic.js"></script>
+	    <script charset="UTF-8" type="text/javascript" src="../../classic/js/management_classic.js"></script>
+
+	<script type="text/javascript">
+		var lblTotalOverTime = '\u7D2F\u7A4D\u6B8B\u696D\u6642\u9593';
+		var lblExcessCount36Agreement = '36\u5354\u5B9A<br>\u8D85\u904E\u56DE\u6570';
+		var lblExcessCountSpecialClause = '\u7279\u5225\u6761\u9805<br>\u8D85\u904E\u56DE\u6570';
+		var lblGoalOverTime = '\u76EE\u6A19\u6B8B\u696D\u6642\u9593';
+		var lblMaxOverTime = '\u4E0A\u9650\u6B8B\u696D\u6642\u9593';
+		var lblAvgOverTime = '\u5E73\u5747\u6B8B\u696D\u6642\u9593';
+		var lblFcstOverTime = '\u4E88\u60F3\u6B8B\u696D\u6642\u9593';
+		var multiValidError = '[X]\u4EF6\u306E\u30A8\u30E9\u30FC\u304C\u3042\u308A\u307E\u3059\u3002'
+		var detailBtn = '\u8A73\u7D30'
+		var editingLbl = '\u5165\u529B\u4E2D';
+		var rejectedLbl = '\u5DEE\u623B\u3057';
+		var requetedLbl = '\u7533\u8ACB\u6E08';
+		var confirmedLbl = '\u78BA\u8A8D\u6E08\u307F';
+		var approvedLbl = '\u627F\u8A8D\u6E08';
+		var loginFlg = 'local';
+		var showLbl = 'SHOW';
+		var hideLbl = 'HIDE';
+	</script>
+
+		<meta charset="UTF-8" />
+
+		<meta name="ctx" />
+
+		<link rel="stylesheet" type="text/css" href="../../classic/css/cico.css" />
+
+		<link rel="stylesheet" type="text/css" href="../../classic/css/break-time-cico.css" />
+
+		<script type="text/javascript" src="../../plugins/bootstrap/bootstrap-dialog.min.js"></script>
+
+		<script type="text/javascript" src="../../plugins/lodash/lodash.min.js"></script>
+
+		<script type="text/javascript" src="../../common/js/hitotime.dialog.js"></script>
+
+		<script type="text/javascript" src="../../classic/js/breakTimeCico.js"></script>
+
+		<script type="text/javascript" src="../../classic/js/cico.js"></script>
+
+		<script type="text/javascript">
+    var totalBreakTime = null
+    var serialNumber = null
+    var mapBreakTime = null
+    var warningBreakStart = '\u524D\u56DE\u306E\u4F11\u61A9\u7D42\u4E86\u6642\u9593\u304C\u307E\u3060\u6253\u523B\u3055\u308C\u3066\u304A\u308A\u307E\u305B\u3093\u3002\u7D9A\u3051\u3066\u3082\u3088\u308D\u3057\u3044\u3067\u3057\u3087\u3046\u304B\uFF1F'
+    var warningBreakEnd = '\u4F11\u61A9\u958B\u59CB\u6642\u9593\u304C\u307E\u3060\u6253\u523B\u3055\u308C\u3066\u304A\u308A\u307E\u305B\u3093\u3002\u7D9A\u3051\u3066\u3082\u3088\u308D\u3057\u3044\u3067\u3057\u3087\u3046\u304B\uFF1F'
+    var warningClockOut = '\u4F11\u61A9\u958B\u59CB\u6642\u9593\u306F{0}\u3068\u306A\u3063\u3066\u3044\u307E\u3059\u304C\u3001\u4F11\u61A9\u7D42\u4E86\u6642\u9593\u304C\u307E\u3060\u6253\u523B\u3055\u308C\u3066\u304A\u308A\u307E\u305B\u3093\u3002\u5C31\u696D\u72B6\u6CC1\u753B\u9762\u3088\u308A\u4FEE\u6B63\u3057\u3066\u304F\u3060\u3055\u3044\u3002'
+    var enableBreakTime = false
+    var approvalRequested = true
+    var warningApprovalBreakStart = '\u4F11\u61A9\u958B\u59CB\u6253\u523B\u306F\u5B8C\u4E86\u3057\u307E\u3057\u305F\u304C\u3001\u52E4\u6020\u7533\u8ACB\u6E08\u307F\u305F\u3081\u4F11\u61A9\u958B\u59CB\u6642\u9593\u3092\u66F4\u65B0\u3057\u3066\u304A\u308A\u307E\u305B\u3093\u3002'
+    var warningApprovalBreakEnd = '\u4F11\u61A9\u6253\u523B\u306F\u5B8C\u4E86\u3057\u307E\u3057\u305F\u304C\u3001\u52E4\u6020\u7533\u8ACB\u6E08\u307F\u305F\u3081\u4F11\u61A9\u6642\u9593\u3092\u66F4\u65B0\u3057\u3066\u304A\u308A\u307E\u305B\u3093\u3002'
+    var warningBreakTimeRegisteredFull = '\u4F11\u61A9\u6253\u523B\u306F\u5B8C\u4E86\u3057\u307E\u3057\u305F\u304C\u3001\u4F11\u61A9\u6642\u9593\u304C5\u56DE\u767B\u9332\u3055\u308C\u3066\u3044\u308B\u305F\u3081\u3001\u4F11\u61A9\u6642\u9593\u3092\u66F4\u65B0\u3057\u3066\u304A\u308A\u307E\u305B\u3093\u3002'
+  </script>
+
+	</head>
+
+	<body>
+		
+
+			
+			
+			<header class="layoutBox_header clearfix" style="background-color: #97989a;"><!-- テンプ色 #e5117c -->
+				<nav class="">
+	
+		<ul class="Gnavi clearfix">
+				<li class="GnaviIn" id="cico-page">
+				<a class="Gnavi__tab Gnavi__tab01 Gnavi__tab01--selected" href="#">打刻</a></li>
+
+				<li class="GnaviIn" id="work-condition-page">
+				<a class="Gnavi__tab Gnavi__tab02" href="#">就業状況</a></li>
+
+				
+
+				
+
+				
+				
+			<li class="GnaviIn" id="dashboard-page"><a class="Gnavi__tab Gnavi__tab03" href="#">ダッシュボード</a></li>
+
+		</ul>
+	
+
+	
+
+	<div class="myInfoBox">
+        
+        
+        <span class="u_maL17">foo株式会社</span>
+        <span class="myInfoBox__workCat u_maL15"><span class="myInfoBox__workCatBadge">裁量労働制</span></span>
+        <span class="myInfoBox__myName u_maL13" style="color: #000;">
+        	<span class="ellipsis-medium" title="部署">部署</span>
+        	<span class="ellipsis-medium" title="sinsoku">sinsoku</span>
+        </span>
+        <span class="u_maL7">
+              <input class="myMenu__Toggle u_hidden" name="is-ToggleShowHide" type="radio" />
+              <label for="myMenu" id="myMenu"><img class="myInfoBox__myFace" id="avatar" src="/../common/images/default-avatar.png" /></label>
+              <!-- ▼ My menu ▼ -->
+
+              <article class="myMenu">
+                  <h1 class="myMenu__ttl01">マイメニュー</h1>
+				
+					<article class="myMenu__eachInfoBox">
+						<h2 class="myMenu__ttl02">休暇情報</h2>
+						<table class="myMenu__table" id="leaveInfo">
+						</table>
+					</article>
+
+
+					<article class="myMenu__eachInfoBox">
+						<h2 class="myMenu__ttl02">休暇払出申請状況</h2>
+						<table class="myMenu__table">
+							<thead>
+								<tr>
+									<th class="myMenu__tableCell myMenu__tableCell--th">休暇種別</th>
+									<th class="myMenu__tableCell myMenu__tableCell--th">利用可能日</th>
+									<th class="myMenu__tableCell myMenu__tableCell--th u_txtC">承認状態</th>
+								</tr>
+							</thead>
+							<tbody id="holidayRqstSts"></tbody>
+						</table>
+						<div class="myMenu__note" id="holsRqstStsRem">（6ヶ月以内の申請を表示）</div>
+					</article>
+				
+
+				<article class="myMenu__eachInfoBox">
+                      <h2 class="myMenu__ttl02">各種資料ダウンロード</h2>
+                      <table class="myMenu__table" id="downloadFile">
+                      </table>
+                  </article>
+                  <div class="myMenu__logoutBox">
+				    <div class="myMenu__logoutBoxIn">
+							<div class="myMenu__logoutBtnBox" id="logoutBtn"><button class="btnAction btnAction--L" type="button"><img height="14" src="../../common/images/ico_actionBtn_logout.svg" width="14" />ログアウト</button></div>
+					  </div>
+                  </div>
+              </article>
+            <!-- ▲ My menu ▲ -->
+        </span>
+        <span><label for="myMenu" id="showMyMenu"><span class="myInfoBox__myMenuBtn"><!--<img src="images/arrow_header_mymenu.svg">-->
+                  <svg height="6px" style="enable-background:new 0 0 9 6;" viewBox="0 0 9 6" width="9px" x="0px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" y="0px"><style type="text/css">.st0{fill:#333333;}</style><path class="st0" d="M1.1,0l3.4,3.4L7.9,0L9,1.1L4.5,5.6L0,1.1L1.1,0z"></path>
+                  </svg></span></label>
+        </span>
+        
+    </div>
+
+	<span class="hidden" id="employee-user-id">000001</span>
+  <span class="hidden" id="employee-company-code">A123456</span>
+	<span class="hidden" id="employee-form-code">10000</span>
+	<span class="hidden" id="employee-isBp" data-value="false"></span>
+	<span class="hidden" id="employee-has-application" data-value="false"></span>
+	<span class="hidden" id="employee-position"></span>
+	<span class="hidden" id="alert-success-save">保存しました。</span>
+	<span class="hidden" id="alert-success-requested">申請しました。</span>
+	<span class="hidden" id="alert-success-cancel-requested">取消しました。</span>
+	<span class="hidden" id="alert-success-applied">申請しました。</span>
+	<span class="hidden" id="error-somethingWentWrong">問題が発生しました。少し時間をおいて再度アクセスしてください。</span>
+	<span class="hidden" id="error-billing-page">請求用勤怠に紐付くプロジェクトが存在しません。</span>
+	<span class="hidden" id="hasHeaderError"></span>
+	<span class="hidden" id="headerErrorMsg"></span>
+	<span class="hidden" id="alert-worktime-before-request">承認依頼前に勤務開始終了時刻を入力してください。</span>
+	<span class="hidden" id="alert-shiftid-before-request">承認依頼前にシフトを設定してください。</span>
+
+	<form action="/logout" method="get" name="logout"></form>
+</nav>
+			</header><div class="hidden" id="progress-bar-holder">
+				<div class="progress">
+			          <div class="progress-bar" role="progressbar"></div>
+			     </div>
+			    <div class="disable-modal"></div>
+			</div>
+			
+			
+
+			
+			<main class="layoutBox_mainAll">
+				<div>
+		<div id="loading-icon-holder"></div>
+		<div class="block-table" id="container">
+			
+			<div class="container p_top30 cico-label-color">
+				<div class="text-center">
+					<h1>
+						<strong class="big"><span id="cico-hour">23</span>:<span id="cico-minute">41</span></strong>
+					</h1>
+					<span class="hide" id="cico-second">33</span>
+				</div>
+				<div class="text-center">
+					<h1>
+						<button class="btn btn-link cico-arrow-decoration-none " id="previous-day-cico-btn" type="button" disabled="disabled">
+							<img class="cico-arrow-img" src="../../common/images/previous.png" />
+						</button>
+
+						<small><span id="cico-year">2020</span>/ </small>
+						<span id="cico-month">3</span>/<span id="cico-day">23</span>
+						(<span id="cico-day-of-week">月</span>)
+
+						<button class="btn btn-link cico-arrow-decoration-none" id="next-day-cico-btn" type="button" disabled="disabled">
+							<img class="cico-arrow-img" src="../../common/images/next.png" />
+						</button>
+					</h1>
+					<input id="isEnableNextday" name="isEnableNextday" type="hidden" value="false" />
+					<input id="isEnablePrevday" name="isEnablePrevday" type="hidden" value="false" />
+				</div>
+				<div class="m_top30 row cico-area center-block" id="clock-buttons-div">
+					<div class="display_inline">
+						<div class="attendance-label">出社</div>
+						<div class="col-xs-24 cico-button-area">
+							<div class="cico-circle center-block m_top20 background-size-contain disable-cico" id="cico-clock-in-button" ondragover="allowClockDrop(event)" ondrop="dropClockInPC(event)" style="background:url(../../common/images/ico_condi02.svg) no-repeat center;">
+								<strong class="cico-label hide" id="cico-late-label">遅刻</strong>
+								
+							</div>
+							<div class="m_top8" id="clock-in-time-div">
+								<strong id="cico-clock-in-time">08:48</strong>
+							</div>
+						</div>
+					</div>
+
+					<div class="separator display_incline"></div>
+
+					<div class="display_inline">
+						<div class="attendance-label">退社</div>
+						<div class="col-xs-24 cico-button-area">
+							<div class="cico-circle center-block m_top20 background-size-contain disable-cico" id="cico-clock-out-button" ondragover="allowClockDrop(event)" ondrop="dropClockOutPC(event)" style="background:url(../../common/images/ico_condi02.svg) no-repeat center;">
+								<strong class="cico-label hide" id="cico-early-label">早退</strong>
+								
+							</div>
+							<div class="m_top8" id="clock-out-time-div">
+								<strong id="cico-clock-out-time">18:02</strong>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row center-block" id="cico-conditions-div">
+					<div class="font-bold col-xs-48 p_top10 p_bottom10 text-center" id="cico-clock-condition-label">
+						<strong>あなたのコンディションをドロップしましょう</strong>
+					</div>
+					<div class="col-xs-48 text-center" id="cico-clock-condition">
+						<div class="cico-condition-button button-clone" draggable="true" ondragstart="dragClock(event)" data-image-id="1" id="image-1" style="background:url(../../common/images/ico_condi01.svg) no-repeat center;"></div>
+						<div class="cico-condition-button button-clone" draggable="true" ondragstart="dragClock(event)" data-image-id="2" id="image-2" style="background:url(../../common/images/ico_condi02.svg) no-repeat center;"></div>
+						<div class="cico-condition-button button-clone" draggable="true" ondragstart="dragClock(event)" data-image-id="3" id="image-3" style="background:url(../../common/images/ico_condi03.svg) no-repeat center;"></div>
+						<div class="cico-condition-button button-clone" draggable="true" ondragstart="dragClock(event)" data-image-id="4" id="image-4" style="background:url(../../common/images/ico_condi04.svg) no-repeat center;"></div>
+					</div>
+					<div class="col-xs-48 text-center dragable-dv" id="cico-clock-condition">
+						<div class="cico-condition-button button-drag" draggable="true" ondragstart="dragClock(event)" data-image-id="1" id="image-1" style="background:url(../../common/images/ico_condi01.svg) no-repeat center;"></div>
+						<div class="cico-condition-button button-drag" draggable="true" ondragstart="dragClock(event)" data-image-id="2" id="image-2" style="background:url(../../common/images/ico_condi02.svg) no-repeat center;"></div>
+						<div class="cico-condition-button button-drag" draggable="true" ondragstart="dragClock(event)" data-image-id="3" id="image-3" style="background:url(../../common/images/ico_condi03.svg) no-repeat center;"></div>
+						<div class="cico-condition-button button-drag" draggable="true" ondragstart="dragClock(event)" data-image-id="4" id="image-4" style="background:url(../../common/images/ico_condi04.svg) no-repeat center;"></div>
+					</div>
+				</div>
+
+				<!--Break time-->
+				<div class="text-center">
+					
+				</div>
+				
+				<!--End of break time-->
+
+				
+				<div class="row center-block hide" id="late-early-form-container">
+					<div class="col-xs-48 m_bottom10 text-center">
+						
+						
+					</div>
+					<div class="col-xs-48 m_bottom30 text-center">
+							<strong class="hide" id="cico-exception-duration"></strong>
+							<span class="font20" id="cico-exception-type"></span>
+					</div>
+					<div class="col-xs-48 text-center">
+						<div class="col-xs-offset-6 col-xs-18 text-left hide" id="reason-div">
+							<div class="u_maB15">
+								<span class="u_txtBold">理由:</span>
+							</div>
+							<div>
+								
+								
+								
+								
+								<div class="u_maB10 no-padding hide early-reason">
+									<input name="early" style="margin-top:0" type="radio" checked="checked" value="6" />
+										<span>早退(私用 事前連絡済み)</span>
+								</div>
+								<div class="u_maB10 no-padding hide early-reason">
+									<input name="early" style="margin-top:0" type="radio" value="7" />
+										<span>早退(その他)</span>
+								</div>
+								
+								
+								<div class="u_maB10 no-padding hide late-reason">
+									<input name="late" style="margin-top:0" type="radio" checked="checked" value="3" />
+										<span>遅刻(交通遅延)</span>
+								</div>
+								<div class="u_maB10 no-padding hide late-reason">
+									<input name="late" style="margin-top:0" type="radio" value="4" />
+										<span>遅刻(私用 事前連絡済み)</span>
+								</div>
+								<div class="u_maB10 no-padding hide late-reason">
+									<input name="late" style="margin-top:0" type="radio" value="5" />
+										<span>遅刻(その他)</span>
+								</div>
+								
+								
+								
+								<div class="u_maB10 no-padding hide">
+									<input id="ci-early" type="hidden" value="0" />
+								</div>
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								<div class="u_maB10 no-padding hide">
+									<input id="co-late" type="hidden" value="9" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-18">
+							<div class="text-left no-padding remark-label u_maB15">
+								<span class="u_txtBold">備考：</span>
+							</div>
+							<div class="form-group no-padding">
+								<textarea class="form-control border-color-black" id="remarks" maxlength="100" rows="4"></textarea>
+							</div>
+						</div>
+						<div class="col-xs-48 u_maT10">
+							<button class="btnAction btnAction--L u_min-w124" id="cico-form-ok-button" type="button">OK</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div>
+	<div class="modal fade" id="error-modal" tabindex="-1">
+		<div class="modal-dialog confirm">
+			<div class="modal-content">
+				<div class="modal-header"></div>
+				<div class="modal-body">
+					<span id="error-modal-message"></span>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal" type="button">
+						<span>OK</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="warning-modal" tabindex="-1">
+		<div class="modal-dialog confirm">
+			<div class="modal-content">
+				<div class="modal-header"></div>
+				<div class="modal-body">
+					<span>勤務時間がマイナスになっています。就業状況より修正してください。</span>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal" type="button">
+						<span>OK</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="exceptionModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					
+					
+					<h4>
+						<strong class="hide" id="cico-exception-duration"></strong>
+						<span id="cico-exception-type"></span>
+					</h4>
+				</div>
+				<div class="modal-body row">
+					<div class="col-xs-12 input" id="option-div">
+						<label>理由:</label>
+
+
+						
+
+
+						
+
+
+						
+
+
+						
+
+
+						<div class="radio hide early-reason">
+							<label><input name="early-mobile" type="radio" checked="checked" value="6">早退(私用 事前連絡済み)</input></label>
+						</div>
+
+
+						<div class="radio hide early-reason">
+							<label><input name="early-mobile" type="radio" value="7">早退(その他)</input></label>
+						</div>
+
+
+						
+
+						
+
+						<div class="radio hide late-reason">
+							<label><input name="late-mobile" type="radio" checked="checked" value="3">遅刻(交通遅延)</input></label>
+						</div>
+
+						<div class="radio hide late-reason">
+							<label><input name="late-mobile" type="radio" value="4">遅刻(私用 事前連絡済み)</input></label>
+						</div>
+
+						<div class="radio hide late-reason">
+							<label><input name="late-mobile" type="radio" value="5">遅刻(その他)</input></label>
+						</div>
+
+						
+
+						
+
+						
+						<div class="hide">
+							<input id="ci-early" type="hidden" value="0" />
+						</div>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						<div class="hide">
+							<input id="co-late" type="hidden" value="9" />
+						</div>
+					</div>
+					<div class="col-xs-12 input m_top15">
+						<div class="form-group">
+							<label>備考：</label>
+							<textarea class="form-control" id="remarks"></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer row">
+					<div class="col-xs-3 p_left5">
+						<button class="btn btn-default" id="clear-remarks" type="button">クリア</button>
+					</div>
+					<div class="col-xs-9 p_right5 pull-right text-right">
+						<button class="btn btn-default" data-dismiss="modal" type="button">キャンセル</button>
+						<button class="btn btn-primary" id="cico-form-ok-button" type="button">OK</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<span class="hide" id="error-message-cannot-clock-in">申し訳ありません。クロックインできませんでした。</span>
+	<span class="hide" id="error-message-cannot-clock-out">申し訳ありません。クロックアウトできませんでした。</span>
+	<span class="hide" id="error-message-munis-time">勤務時間がマイナスになっています。就業状況より修正してください。</span>
+	<span class="hide" id="error-message-something-went-wrong">データが正常に処理できませんでした。しばらく経ってからもう一度お試しください。</span>
+	<span class="hide" id="error-message-success-non-proval-request">退勤打刻は完了しましたが、労働時間が0分以下のため申請を行っておりません。就業状況画面より勤怠の修正後、申請をお願いします。</span>
+	<span class="hide" id="error-message-clockout-range-over">48:00を超えて打刻はできません。就業状況画面より勤怠の入力をお願いします。</span>
+	<span class="hide" id="error-message-clockin-already-request">出勤打刻は完了しましたが、勤怠申請済みため勤務開始時間を更新しておりません。</span>
+	<span class="hide" id="clock-image-id"></span>
+	<span class="hide" id="error-message-clockout-already-request">退勤打刻は完了しましたが、勤怠申請済みため勤務終了時間を更新しておりません。</span>
+	<span class="hide" id="error-message-clockout-noChangebleShift">{0}のため打刻できません。</span>
+
+
+	<span class="hide" id="late-arrival-label">遅刻</span>
+	<span class="hide" id="early-arrival-label">早出</span>
+	<span class="hide" id="late-overtime-label">残業</span>
+	<span class="hide" id="early-undertime-label">早退</span>
+
+
+	<div>
+		
+	</div>
+	<div>
+		
+	</div>
+
+	<div>
+		
+	</div>
+
+	<div>
+		
+	</div>
+
+	<span id="employee-type" data-flex="false" data-shift="false"></span>
+	<div>
+		<span id="daily-attendance" data-clock-in-time="2020-03-23 08:48:12.173" data-clock-out-time="2020-03-23 18:02:04.43" data-shift-start="03/23/2020 09:30" data-flexible="false" data-shift-end="03/23/2020 18:30" data-core="false"></span>
+	</div>
+</div>
+	</div>
+	
+				<div class="hidden disable-modal-sm" id="loading-icon">
+		<div class="sk-circle">
+		  <div class="sk-circle1 sk-child"></div>
+		  <div class="sk-circle2 sk-child"></div>
+		  <div class="sk-circle3 sk-child"></div>
+		  <div class="sk-circle4 sk-child"></div>
+		  <div class="sk-circle5 sk-child"></div>
+		  <div class="sk-circle6 sk-child"></div>
+		  <div class="sk-circle7 sk-child"></div>
+		  <div class="sk-circle8 sk-child"></div>
+		  <div class="sk-circle9 sk-child"></div>
+		  <div class="sk-circle10 sk-child"></div>
+		  <div class="sk-circle11 sk-child"></div>
+		  <div class="sk-circle12 sk-child"></div>
+		</div>
+	</div>
+			</main>
+			
+
+			
+			<footer id="footer">
+	<div class="company-area"></div>
+</footer>
+			
+
+  		
+  
+</body></html>

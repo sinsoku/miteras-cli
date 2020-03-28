@@ -21,4 +21,6 @@ tokio = { version = "0.2", features = ["macros"] }
 toml = "0.5.6"
 
 [dev-dependencies]
+assert_cmd = "0.12"
 mockito = "0.23.3"
+predicates = "1.0.4"
