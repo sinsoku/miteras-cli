@@ -6,17 +6,17 @@ use rpassword::read_password;
 use rpassword::read_password_with_reader;
 use std::io::{self, BufRead, Empty, Write};
 
-pub fn run(matches: ArgMatches) {
+pub fn run<W: Write>(matches: ArgMatches, mut writer: W) {
     if let Some(_matches) = matches.subcommand_matches("login") {
-        login(None::<Empty>, io::stdout());
+        login(None::<Empty>, &mut writer);
     }
 
     if let Some(matches) = matches.subcommand_matches("clock-in") {
-        clock_in(matches);
+        clock_in(matches, &mut writer);
     }
 
     if let Some(matches) = matches.subcommand_matches("clock-out") {
-        clock_out(matches);
+        clock_out(matches, &mut writer);
     }
 }
 
@@ -71,22 +71,22 @@ pub fn login<R: BufRead, W: Write>(mut source: Option<R>, mut writer: W) {
     }
 }
 
-pub fn clock_in(matches: &ArgMatches) {
+pub fn clock_in<W: Write>(matches: &ArgMatches, mut writer: W) {
     let condition = matches.value_of("condition").unwrap();
     let config = Config::load().unwrap();
     let api = Api::new(&config);
 
     let res = api.clock_in(condition).unwrap();
-    println!("{}", res.text().unwrap());
+    write!(writer, "{}", res.text().unwrap()).unwrap();
 }
 
-pub fn clock_out(matches: &ArgMatches) {
+pub fn clock_out<W: Write>(matches: &ArgMatches, mut writer: W) {
     let condition = matches.value_of("condition").unwrap();
     let config = Config::load().unwrap();
     let api = Api::new(&config);
 
     let res = api.clock_out(condition).unwrap();
-    println!("{}", res.text().unwrap());
+    write!(writer, "{}", res.text().unwrap()).unwrap();
 }
 
 #[cfg(test)]
@@ -186,15 +186,21 @@ mod tests {
         let _m4 = mock("POST", "/A123456/submitClockIn")
             .match_header("content-type", "application/json")
             .match_body(Matcher::Json(params))
+            .with_body("{\"returnValue\":\"Success\",\"filePath\":\"../../common/images/ico_condi02.svg\",\"clockTime\":\"10:00\"}")
             .create();
 
         let matches = build_app().get_matches_from(vec!["miteras", "clock-in"]);
-        run(matches);
+        let mut writer = Vec::<u8>::new();
+        run(matches, &mut writer);
 
         _m1.assert();
         _m2.assert();
         _m3.assert();
         _m4.assert();
+        assert_eq!(
+            String::from_utf8(writer).unwrap(),
+            "{\"returnValue\":\"Success\",\"filePath\":\"../../common/images/ico_condi02.svg\",\"clockTime\":\"10:00\"}"
+        );
     }
 
     #[test]
@@ -224,14 +230,20 @@ mod tests {
         let _m4 = mock("POST", "/A123456/submitClockOut")
             .match_header("content-type", "application/json")
             .match_body(Matcher::Json(params))
+            .with_body("{\"returnValue\":\"Success\",\"atmessage\":\"Your Attendance request has been sent\",\"filePath\":\"../../common/images/ico_condi02.svg\",\"clockTime\":\"19:00\"}")
             .create();
 
         let matches = build_app().get_matches_from(vec!["miteras", "clock-out"]);
-        run(matches);
+        let mut writer = Vec::<u8>::new();
+        run(matches, &mut writer);
 
         _m1.assert();
         _m2.assert();
         _m3.assert();
         _m4.assert();
+        assert_eq!(
+            String::from_utf8(writer).unwrap(),
+            "{\"returnValue\":\"Success\",\"atmessage\":\"Your Attendance request has been sent\",\"filePath\":\"../../common/images/ico_condi02.svg\",\"clockTime\":\"19:00\"}"
+        );
     }
 }
