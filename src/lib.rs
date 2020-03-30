@@ -10,5 +10,6 @@ extern crate serde_json;
 extern crate toml;
 
 pub mod api;
+pub mod app;
 pub mod cli;
 pub mod config;

@@ -1,7 +1,7 @@
 extern crate miteras;
-use miteras::cli;
+use miteras::app;
 
 fn main() {
-    let matches = cli::build_app().get_matches();
-    cli::run(matches);
+    let matches = app::build_app().get_matches();
+    app::run(matches);
 }
