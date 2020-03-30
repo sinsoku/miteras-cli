@@ -4,6 +4,7 @@ use crate::config::Config;
 use clap::{App, ArgMatches};
 use rpassword::read_password;
 use rpassword::read_password_with_reader;
+use serde_json::Value;
 use std::io::{self, BufRead, Empty, Write};
 
 pub fn run<W: Write>(matches: ArgMatches, mut writer: W) {
@@ -77,7 +78,13 @@ pub fn clock_in<W: Write>(matches: &ArgMatches, mut writer: W) {
     let api = Api::new(&config);
 
     let res = api.clock_in(condition).unwrap();
-    write!(writer, "{}", res.text().unwrap()).unwrap();
+    let json: Value = serde_json::from_str(&res.text().unwrap()).unwrap();
+    if json["returnValue"] == "Success" {
+        let clock_time = json["clockTime"].as_str().unwrap();
+        write!(writer, "clock-in at {}", clock_time).unwrap();
+    } else {
+        write!(writer, "clock-in failed.").unwrap();
+    }
 }
 
 pub fn clock_out<W: Write>(matches: &ArgMatches, mut writer: W) {
@@ -86,7 +93,13 @@ pub fn clock_out<W: Write>(matches: &ArgMatches, mut writer: W) {
     let api = Api::new(&config);
 
     let res = api.clock_out(condition).unwrap();
-    write!(writer, "{}", res.text().unwrap()).unwrap();
+    let json: Value = serde_json::from_str(&res.text().unwrap()).unwrap();
+    if json["returnValue"] == "Success" {
+        let clock_time = json["clockTime"].as_str().unwrap();
+        write!(writer, "clock-out at {}", clock_time).unwrap();
+    } else {
+        write!(writer, "clock-out failed.").unwrap();
+    }
 }
 
 #[cfg(test)]
@@ -197,10 +210,7 @@ mod tests {
         _m2.assert();
         _m3.assert();
         _m4.assert();
-        assert_eq!(
-            String::from_utf8(writer).unwrap(),
-            "{\"returnValue\":\"Success\",\"filePath\":\"../../common/images/ico_condi02.svg\",\"clockTime\":\"10:00\"}"
-        );
+        assert_eq!(String::from_utf8(writer).unwrap(), "clock-in at 10:00");
     }
 
     #[test]
@@ -241,9 +251,6 @@ mod tests {
         _m2.assert();
         _m3.assert();
         _m4.assert();
-        assert_eq!(
-            String::from_utf8(writer).unwrap(),
-            "{\"returnValue\":\"Success\",\"atmessage\":\"Your Attendance request has been sent\",\"filePath\":\"../../common/images/ico_condi02.svg\",\"clockTime\":\"19:00\"}"
-        );
+        assert_eq!(String::from_utf8(writer).unwrap(), "clock-out at 19:00");
     }
 }
