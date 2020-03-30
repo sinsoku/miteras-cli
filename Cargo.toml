@@ -1,6 +1,6 @@
 [package]
 name = "miteras"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["sinsoku <sinsoku.listy@gmail.com>"]
 license = "MIT"
 homepage = "https://github.com/sinsoku/miteras-cli"
