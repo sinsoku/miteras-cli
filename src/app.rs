@@ -66,9 +66,9 @@ pub fn login<R: BufRead, W: Write>(mut source: Option<R>, mut writer: W) {
 
     if res.url().path().ends_with("/cico") {
         config.save().ok();
-        write!(&mut writer, "\nLogin successful.").unwrap();
+        write!(&mut writer, "\nLogin successful.\n").unwrap();
     } else {
-        write!(&mut writer, "\nLogin failed.").unwrap();
+        write!(&mut writer, "\nLogin failed.\n").unwrap();
     }
 }
 
@@ -81,9 +81,9 @@ pub fn clock_in<W: Write>(matches: &ArgMatches, mut writer: W) {
     let json: Value = serde_json::from_str(&res.text().unwrap()).unwrap();
     if json["returnValue"] == "Success" {
         let clock_time = json["clockTime"].as_str().unwrap();
-        write!(writer, "clock-in at {}", clock_time).unwrap();
+        write!(writer, "clock-in at {}\n", clock_time).unwrap();
     } else {
-        write!(writer, "clock-in failed.").unwrap();
+        write!(writer, "clock-in failed.\n").unwrap();
     }
 }
 
@@ -96,9 +96,9 @@ pub fn clock_out<W: Write>(matches: &ArgMatches, mut writer: W) {
     let json: Value = serde_json::from_str(&res.text().unwrap()).unwrap();
     if json["returnValue"] == "Success" {
         let clock_time = json["clockTime"].as_str().unwrap();
-        write!(writer, "clock-out at {}", clock_time).unwrap();
+        write!(writer, "clock-out at {}\n", clock_time).unwrap();
     } else {
-        write!(writer, "clock-out failed.").unwrap();
+        write!(writer, "clock-out failed.\n").unwrap();
     }
 }
 
@@ -140,7 +140,7 @@ mod tests {
         let _m2 = mock_auth(true);
         let _m3 = mock_cico();
 
-        let source = Cursor::new(b"A123456\nsinsoku\npass1234");
+        let source = Cursor::new(b"A123456\nsinsoku\npass1234\n");
         let mut writer = Vec::<u8>::new();
         login(Some(source), &mut writer);
 
@@ -149,7 +149,7 @@ mod tests {
         _m3.assert();
         assert_eq!(
             String::from_utf8(writer).unwrap(),
-            "Try logging in to MITERAS.\nOrg: Username: Password: \nLogin successful."
+            "Try logging in to MITERAS.\nOrg: Username: Password: \nLogin successful.\n"
         );
     }
 
@@ -161,7 +161,7 @@ mod tests {
             .create();
         let _m2 = mock_auth(false);
 
-        let source = Cursor::new(b"A123456\nsinsoku\npassXXX");
+        let source = Cursor::new(b"A123456\nsinsoku\npassXXX\n");
         let mut writer = Vec::<u8>::new();
         login(Some(source), &mut writer);
 
@@ -169,7 +169,7 @@ mod tests {
         _m2.assert();
         assert_eq!(
             String::from_utf8(writer).unwrap(),
-            "Try logging in to MITERAS.\nOrg: Username: Password: \nLogin failed."
+            "Try logging in to MITERAS.\nOrg: Username: Password: \nLogin failed.\n"
         );
     }
 
@@ -210,7 +210,7 @@ mod tests {
         _m2.assert();
         _m3.assert();
         _m4.assert();
-        assert_eq!(String::from_utf8(writer).unwrap(), "clock-in at 10:00");
+        assert_eq!(String::from_utf8(writer).unwrap(), "clock-in at 10:00\n");
     }
 
     #[test]
@@ -251,6 +251,6 @@ mod tests {
         _m2.assert();
         _m3.assert();
         _m4.assert();
-        assert_eq!(String::from_utf8(writer).unwrap(), "clock-out at 19:00");
+        assert_eq!(String::from_utf8(writer).unwrap(), "clock-out at 19:00\n");
     }
 }
