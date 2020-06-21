@@ -50,4 +50,4 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/sinsok
 
 ## License
 
-The Orb is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+The tool is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
