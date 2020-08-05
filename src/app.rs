@@ -121,7 +121,6 @@ mod tests {
         } else {
             "/A123456/login"
         };
-        println!("{}", location);
         mock("POST", "/A123456/auth")
             .with_status(302)
             .with_header("Location", location)
