@@ -26,4 +26,8 @@ pub fn build_cli() -> App<'static, 'static> {
                         .default_value("good"),
                 ),
         )
+        .subcommand(
+            SubCommand::with_name("update-password")
+                .about("Change your password with an auto-generated password")
+        )
 }
