@@ -59,7 +59,6 @@ fn work_date_string() -> String {
     format!("{}-{}-{}", today.year(), today.month(), today.day())
 }
 
-
 fn parse_csrf(body: String) -> String {
     let fragment = Html::parse_fragment(&body);
     let selector = Selector::parse("meta[name='_csrf'], input[name='_csrf']").unwrap();

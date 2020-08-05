@@ -111,7 +111,9 @@ pub fn update_password<W: Write>(mut writer: W) {
     let new_config = config.gen_password();
     let api = Api::new(&config);
 
-    let res = api.update_password(new_config.password.to_string()).unwrap();
+    let res = api
+        .update_password(new_config.password.to_string())
+        .unwrap();
     let res_body = res.text().unwrap();
 
     if res_body == "" {

@@ -1,8 +1,8 @@
+use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::PathBuf;
-use rand::Rng;
 
 #[derive(Deserialize, Serialize)]
 pub struct Config {
@@ -43,7 +43,11 @@ impl Config {
             .take(20)
             .collect();
 
-        Self::new(self.org.to_string(), self.username.to_string(), new_password)
+        Self::new(
+            self.org.to_string(),
+            self.username.to_string(),
+            new_password,
+        )
     }
 
     pub fn save(&self) -> Result<(), Box<dyn std::error::Error>> {
