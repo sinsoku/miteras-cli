@@ -51,6 +51,20 @@ fn work_date_string() -> String {
     format!("{}-{}-{}", today.year(), today.month(), today.day())
 }
 
+
+fn parse_csrf(body: String) -> String {
+    let fragment = Html::parse_fragment(&body);
+    let selector = Selector::parse("meta[name='_csrf'], input[name='_csrf']").unwrap();
+    let tag = fragment.select(&selector).next().unwrap().value();
+
+    let attr = if tag.name() == "meta" {
+        "content"
+    } else {
+        "value"
+    };
+    tag.attr(attr).unwrap().to_string()
+}
+
 impl Api {
     pub fn new(config: &Config) -> Api {
         let conf = Config::new(
@@ -73,18 +87,13 @@ impl Api {
     pub fn login(&self) -> Result<Response, reqwest::Error> {
         let login_url = self.build_url("login");
         let login_res = self.client.get(&login_url).send().unwrap();
-
-        let body = login_res.text().unwrap();
-        let fragment = Html::parse_fragment(&body);
-        let selector = Selector::parse("input[name='_csrf']").unwrap();
-        let input = fragment.select(&selector).next().unwrap();
-        let csrf = input.value().attr("value").unwrap();
+        let csrf = parse_csrf(login_res.text().unwrap());
 
         let auth_url = self.build_url("auth");
         let mut params: HashMap<&str, &str> = HashMap::new();
         params.insert("username", &self.config.username);
         params.insert("password", &self.config.password);
-        params.insert("_csrf", csrf);
+        params.insert("_csrf", &csrf);
         self.client
             .post(&auth_url)
             .form(&params)
@@ -94,11 +103,7 @@ impl Api {
 
     pub fn clock_in(&self, condition: &str) -> Result<Response, reqwest::Error> {
         let auth_res = self.login().unwrap();
-        let body = auth_res.text().unwrap();
-        let fragment = Html::parse_fragment(&body);
-        let selector = Selector::parse("meta[name='_csrf']").unwrap();
-        let input = fragment.select(&selector).next().unwrap();
-        let csrf = input.value().attr("content").unwrap();
+        let csrf = parse_csrf(auth_res.text().unwrap());
 
         let cico_url = self.build_url("cico");
         let url = self.build_url("submitClockIn");
@@ -121,11 +126,7 @@ impl Api {
 
     pub fn clock_out(&self, condition: &str) -> Result<Response, reqwest::Error> {
         let auth_res = self.login().unwrap();
-        let body = auth_res.text().unwrap();
-        let fragment = Html::parse_fragment(&body);
-        let selector = Selector::parse("meta[name='_csrf']").unwrap();
-        let input = fragment.select(&selector).next().unwrap();
-        let csrf = input.value().attr("content").unwrap();
+        let csrf = parse_csrf(auth_res.text().unwrap());
 
         let cico_url = self.build_url("cico");
         let url = self.build_url("submitClockOut");
