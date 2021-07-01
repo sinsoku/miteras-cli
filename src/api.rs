@@ -32,6 +32,7 @@ struct ClockOutParams {
     work_date_string: String,
     stamp_break_start: String,
     stamp_break_end: String,
+    updated_date_string: String,
 }
 
 // TODO: Refactor to enum
@@ -63,6 +64,13 @@ fn parse_csrf(body: String) -> String {
         "value"
     };
     tag.attr(attr).unwrap().to_string()
+}
+
+fn parse_updated_date_string(body: String) -> String {
+    let fragment = Html::parse_fragment(&body);
+    let selector = Selector::parse("#daily-attendance").unwrap();
+    let tag = fragment.select(&selector).next().unwrap().value();
+    tag.attr("data-updated-date").unwrap().to_string()
 }
 
 impl Api {
@@ -126,7 +134,9 @@ impl Api {
 
     pub fn clock_out(&self, condition: &str) -> Result<Response, reqwest::Error> {
         let auth_res = self.login().unwrap();
-        let csrf = parse_csrf(auth_res.text().unwrap());
+        let auth_body = auth_res.text().unwrap();
+        let csrf = parse_csrf(auth_body.clone());
+        let updated_date_string = parse_updated_date_string(auth_body);
 
         let cico_url = self.build_url("cico");
         let url = self.build_url("submitClockOut");
@@ -138,6 +148,7 @@ impl Api {
             work_date_string: work_date_string(),
             stamp_break_start: "".to_string(),
             stamp_break_end: "".to_string(),
+            updated_date_string: updated_date_string,
         };
 
         self.client
