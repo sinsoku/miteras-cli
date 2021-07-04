@@ -1,6 +1,6 @@
 # Changelog
 
-## master (unreleased)
+## main (unreleased)
 
 ## 0.2.0
 

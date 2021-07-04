@@ -1,5 +1,5 @@
 ![build](https://github.com/sinsoku/miteras-cli/workflows/build/badge.svg)
-[![codecov](https://codecov.io/gh/sinsoku/miteras-cli/branch/master/graph/badge.svg)](https://codecov.io/gh/sinsoku/miteras-cli)
+[![codecov](https://codecov.io/gh/sinsoku/miteras-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/sinsoku/miteras-cli)
 
 # MITERAS CLI
 
