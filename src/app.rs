@@ -234,7 +234,8 @@ mod tests {
             "dailyPlaceEvidence": {},
             "workDateString": work_date_string,
             "stampBreakStart": "",
-            "stampBreakEnd": ""
+            "stampBreakEnd": "",
+            "updatedDateString": "2021-07-01 10:00:00.000"
         });
         let _m4 = mock("POST", "/A123456/submitClockOut")
             .match_header("content-type", "application/json")
