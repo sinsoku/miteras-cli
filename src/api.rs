@@ -35,6 +35,14 @@ struct ClockOutParams {
     updated_date_string: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct UpdatePasswordParams {
+    old_pass: String,
+    new_pass: String,
+    confirm_pass: String,
+}
+
 // TODO: Refactor to enum
 fn condition_value(condition: &str) -> i32 {
     match condition {
@@ -51,7 +59,6 @@ fn work_date_string() -> String {
     let today = Local::today();
     format!("{}-{}-{}", today.year(), today.month(), today.day())
 }
-
 
 fn parse_csrf(body: String) -> String {
     let fragment = Html::parse_fragment(&body);
@@ -156,6 +163,24 @@ impl Api {
             .json(&params)
             .header("X-CSRF-TOKEN", csrf)
             .header(header::REFERER, cico_url)
+            .send()
+    }
+
+    pub fn update_password(&self, new_password: String) -> Result<Response, reqwest::Error> {
+        let auth_res = self.login().unwrap();
+        let csrf = parse_csrf(auth_res.text().unwrap());
+
+        let url = self.build_url("resetPassword");
+        let params = UpdatePasswordParams {
+            old_pass: self.config.password.to_string(),
+            new_pass: new_password.to_string(),
+            confirm_pass: new_password.to_string(),
+        };
+
+        self.client
+            .post(&url)
+            .form(&params)
+            .header("X-CSRF-TOKEN", csrf)
             .send()
     }
 

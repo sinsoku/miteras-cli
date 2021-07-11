@@ -19,6 +19,10 @@ pub fn run<W: Write>(matches: ArgMatches, mut writer: W) {
     if let Some(matches) = matches.subcommand_matches("clock-out") {
         clock_out(matches, &mut writer);
     }
+
+    if let Some(_matches) = matches.subcommand_matches("update-password") {
+        update_password(&mut writer);
+    }
 }
 
 pub fn build_app() -> App<'static, 'static> {
@@ -99,6 +103,25 @@ pub fn clock_out<W: Write>(matches: &ArgMatches, mut writer: W) {
         write!(writer, "clock-out at {}\n", clock_time).unwrap();
     } else {
         write!(writer, "clock-out failed.\n").unwrap();
+    }
+}
+
+pub fn update_password<W: Write>(mut writer: W) {
+    let config = Config::load().unwrap();
+    let new_config = config.gen_password();
+    let api = Api::new(&config);
+
+    let res = api
+        .update_password(new_config.password.to_string())
+        .unwrap();
+    let res_body = res.text().unwrap();
+
+    if res_body == "" {
+        new_config.save().ok();
+        write!(writer, "Password changed successfully.\n").unwrap();
+    } else {
+        let json: Value = serde_json::from_str(&res_body).unwrap();
+        write!(writer, "Failed to change your password. {}\n", json).unwrap();
     }
 }
 
